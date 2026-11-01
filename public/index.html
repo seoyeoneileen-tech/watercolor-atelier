@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#D0E4FF">
+<title>풍경 수채화 6주 작품첩</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+/* Layout: 제목 → 3단계 안내 → 전체 진행률 → 6주 목차 → 내 이름 선택·내 작품 → 이름별 현황 / 주차별 모아보기 */
+:root{
+  --brand:#D0E4FF;
+  --paper:#f4f7fb;
+  --sheet:#ffffff;
+  --ink:#1f2a37;
+  --muted:#5f6d7d;
+  --line:#d9e2ee;
+  --wash:#2d4f7c;
+  --wash-soft:#D0E4FF;
+  --on-wash:#ffffff;
+  --sap:#4f7a3a;
+  --danger:#a8432f;
+  --shadow:0 1px 2px rgba(31,42,55,.06),0 6px 18px rgba(45,79,124,.08);
+  --display:"Gowun Batang","Nanum Myeongjo",serif;
+  --body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --paper:#121821;--sheet:#1a2230;--ink:#e8eef6;--muted:#9aa8ba;--line:#2b3647;
+  --wash:#D0E4FF;--wash-soft:#24344b;--on-wash:#14233a;--sap:#9cc176;--danger:#e2876f;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25);color-scheme:dark}}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55}
+img{max-width:100%}
+[hidden]{display:none!important}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:calc(28px + env(safe-area-inset-top,0px)) calc(64px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:28px}
+button,select,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--wash);outline-offset:2px}
+h2{font-family:var(--display);font-size:21px;margin:0;text-wrap:balance}
+section{display:flex;flex-direction:column;gap:12px;min-width:0}
+
+.banner{background:var(--wash-soft);color:var(--ink);border-radius:10px;padding:10px 14px;font-size:14px}
+
+header .eyebrow{font-size:13px;color:var(--muted);letter-spacing:.06em}
+header h1{font-family:var(--display);font-weight:700;font-size:clamp(28px,5vw,40px);line-height:1.2;margin:2px 0 0;text-wrap:balance;letter-spacing:-.01em}
+.stroke{display:block;width:min(280px,64%);height:12px;margin-top:10px;border-radius:8px 14px 10px 6px;background:linear-gradient(90deg,var(--brand),color-mix(in srgb,var(--brand) 55%,transparent) 70%,transparent)}
+
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0;padding:0;list-style:none;counter-reset:s}
+.steps li{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;gap:10px;align-items:center;font-size:14px;min-width:0}
+.steps li::before{counter-increment:s;content:counter(s);flex:none;width:26px;height:26px;border-radius:50%;background:var(--brand);color:#1f2a37;display:grid;place-items:center;font-family:var(--display);font-weight:700}
+@media (max-width:600px){.steps{grid-template-columns:1fr}}
+
+.progress{background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
+.progress .pct{font-family:var(--display);font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+.progress .sub{color:var(--muted);font-size:14px}
+.progress .bar{flex:1 1 100%}
+.bar{height:6px;border-radius:3px;background:color-mix(in srgb,var(--wash) 14%,var(--sheet));overflow:hidden}
+.bar i{display:block;height:100%;background:var(--wash);border-radius:3px;transition:width .4s}
+
+.weeks{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+@media (max-width:700px){.weeks{grid-template-columns:repeat(3,1fr)}}
+.week{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;text-align:left;min-width:0}
+.week:hover{border-color:var(--wash)}
+.week[aria-current="true"]{background:var(--wash-soft);border-color:var(--wash)}
+.week .wn{font-size:12px;color:var(--muted);letter-spacing:.04em}
+.week b{font-family:var(--display);font-size:19px;line-height:1.25}
+.count{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+.picker{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.picker select{padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--sheet);min-width:0;max-width:100%;font-size:16px}
+
+.btn{border:1px solid var(--line);background:var(--sheet);border-radius:8px;padding:8px 14px;font-size:14px;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:var(--wash)}
+.btn.primary{background:var(--wash);border-color:var(--wash);color:var(--on-wash)}
+.btn:disabled{opacity:.55;cursor:default}
+.icon-btn{border:1px solid transparent;background:none;border-radius:6px;padding:4px 8px;font-size:13px;color:var(--muted);white-space:nowrap}
+.icon-btn:hover{border-color:var(--line);color:var(--ink)}
+.note{font-size:13px;color:var(--muted)}
+
+.mine{background:var(--sheet);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px;display:flex;flex-direction:column;gap:14px}
+.mine-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.mine-head .name{font-family:var(--display);font-weight:700;font-size:22px;min-width:0;overflow-wrap:anywhere}
+.name-input{flex:1;min-width:0;font-family:var(--display);font-size:18px;padding:5px 9px;border:1px solid var(--wash);border-radius:6px;background:var(--paper)}
+.done{font-size:13px;color:var(--sap);font-variant-numeric:tabular-nums}
+.slots{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+@media (max-width:760px){.slots{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:380px){.slots{grid-template-columns:repeat(2,1fr)}}
+.slot{position:relative;aspect-ratio:4/3;max-width:100%;border-radius:8px;overflow:hidden;background:var(--paper);border:1px dashed color-mix(in srgb,var(--wash) 35%,var(--line));display:flex;align-items:center;justify-content:center}
+.slot.filled{border-style:solid;border-color:var(--line)}
+.slot .wk{position:absolute;left:6px;top:5px;font-size:11px;background:color-mix(in srgb,var(--sheet) 85%,transparent);padding:0 5px;border-radius:4px;z-index:1}
+.slot button.add{position:absolute;inset:0;border:0;background:none;color:var(--wash);font-size:13px;padding-top:14px}
+.slot button.add:hover{background:var(--wash-soft)}
+.slot img{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in}
+.slot .acts{position:absolute;right:4px;bottom:4px;display:flex;gap:4px;z-index:1}
+.slot .acts button{border:0;border-radius:5px;font-size:12px;padding:3px 8px;background:color-mix(in srgb,var(--sheet) 90%,transparent);color:var(--ink)}
+.slot .acts button.del{color:var(--danger)}
+.slot .busy{position:absolute;inset:0;display:grid;place-items:center;background:color-mix(in srgb,var(--sheet) 82%,transparent);font-size:12px;color:var(--wash);z-index:2}
+.confirm{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:14px;background:var(--wash-soft);color:var(--ink);border-radius:8px;padding:8px 10px}
+.confirm span{flex:1;min-width:0}
+
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;background:var(--sheet);padding:3px;flex-wrap:wrap}
+.seg button{border:0;background:none;padding:6px 14px;border-radius:999px;font-size:14px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--wash);color:var(--on-wash)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+@media (max-width:400px){.grid{grid-template-columns:1fr}}
+.card{background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card.me{border-color:var(--wash);box-shadow:0 0 0 2px var(--wash-soft)}
+.card-head{display:flex;align-items:center;gap:8px;min-width:0}
+.num{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.card-head .name{font-family:var(--display);font-weight:700;font-size:18px;flex:1;min-width:0;overflow-wrap:anywhere;background:none;border:0;padding:0;text-align:left}
+.card-head .name:hover{text-decoration:underline;text-decoration-color:var(--brand);text-decoration-thickness:3px}
+.thumbs{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+.thumb{aspect-ratio:1;border-radius:5px;overflow:hidden;background:var(--paper);border:1px dashed var(--line);display:grid;place-items:center;font-size:10px;color:var(--muted)}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in}
+.thumb.on{border-style:solid}
+.card-foot{display:flex;justify-content:space-between;align-items:center;gap:8px}
+
+.wk-sec{scroll-margin-top:16px}
+.wk-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;border-bottom:2px solid var(--brand);padding-bottom:8px}
+.wk-head .sp{flex:1}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.gallery figure{margin:0;background:var(--sheet);border:1px solid var(--line);border-radius:10px;overflow:hidden;min-width:0}
+.gallery img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;cursor:zoom-in;background:var(--paper)}
+.gallery figcaption{padding:6px 10px;font-size:14px;overflow-wrap:anywhere}
+.none{grid-column:1/-1;color:var(--muted);font-size:14px;padding:18px;border:1px dashed var(--line);border-radius:10px;text-align:center}
+.views{display:flex;flex-direction:column;gap:32px}
+
+.state{background:var(--sheet);border:1px dashed var(--line);border-radius:12px;padding:28px 20px;text-align:center;color:var(--muted)}
+.state b{display:block;font-family:var(--display);font-size:18px;color:var(--ink);margin-bottom:4px}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:8px;font-size:14px;max-width:calc(100% - 32px);z-index:50;box-shadow:var(--shadow)}
+dialog{border:0;border-radius:12px;padding:0;background:var(--sheet);color:var(--ink);max-width:min(96vw,1100px);max-height:92vh;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+dialog::backdrop{background:rgba(20,26,30,.72)}
+dialog img{display:block;max-width:100%;max-height:calc(92vh - 60px);margin:0 auto}
+.dlg-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px}
+.dlg-bar b{font-family:var(--display)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="banner" id="demo-banner" hidden>지금은 <b>미리보기 모드</b>예요. 올린 그림이 이 기기에만 저장되고 다른 사람에게는 보이지 않아요. Netlify에 GitHub로 등록하면 모두가 함께 쓰는 사이트가 됩니다.</div>
+
+  <header>
+    <div class="eyebrow">풍경 수채화 · 6주 수업</div>
+    <h1>풍경 수채화 6주 작품첩</h1>
+    <span class="stroke" aria-hidden="true"></span>
+  </header>
+
+  <ol class="steps" aria-label="이용 방법">
+    <li>내 이름 선택</li>
+    <li>주차별 그림 올리기</li>
+    <li>모두의 그림 함께 보기</li>
+  </ol>
+
+  <div class="progress" aria-live="polite">
+    <span class="pct" id="pct">0%</span>
+    <span class="sub" id="pct-sub">전체 96점 중 0점 올라옴</span>
+    <div class="bar"><i id="pct-bar" style="width:0%"></i></div>
+  </div>
+
+  <section aria-labelledby="toc-h">
+    <h2 id="toc-h">6주 목차</h2>
+    <nav class="weeks" id="weeks" aria-label="6주 목차"></nav>
+  </section>
+
+  <section aria-labelledby="mine-h">
+    <h2 id="mine-h">내 작품 올리기</h2>
+    <div class="picker">
+      <label for="who" class="note">내 이름</label>
+      <select id="who"><option value="">이름을 골라 주세요</option></select>
+      <span class="note">로그인 없이 이름만 고르면 돼요.</span>
+    </div>
+    <div id="mine"></div>
+  </section>
+
+  <section aria-labelledby="all-h">
+    <div class="tools">
+      <h2 id="all-h">모두의 작품</h2>
+      <button class="btn primary" id="save-all" type="button" hidden>전체 그림 저장 (이름별 폴더)</button>
+    </div>
+    <div class="tools">
+      <div class="seg" role="group" aria-label="보기">
+        <button id="view-member" type="button" aria-pressed="true">이름별 현황</button>
+        <button id="view-week" type="button" aria-pressed="false">주차별 모아보기</button>
+      </div>
+      <div class="seg" role="group" aria-label="정렬" id="sort-seg">
+        <button data-sort="order" type="button" aria-pressed="true">번호순</button>
+        <button data-sort="name" type="button" aria-pressed="false">가나다순</button>
+        <button data-sort="progress" type="button" aria-pressed="false">진행률순</button>
+      </div>
+    </div>
+    <div id="status" class="state"><b>작품첩을 불러오는 중이에요</b>잠시만 기다려 주세요.</div>
+    <div class="grid" id="grid"></div>
+    <div class="views" id="weekview" hidden></div>
+  </section>
+</div>
+
+<input type="file" id="file" accept="image/*" hidden>
+<dialog id="viewer"><div class="dlg-bar"><b id="viewer-title"></b><button class="btn" id="viewer-close" type="button">닫기</button></div><img id="viewer-img" alt=""></dialog>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const WEEKS=[1,2,3,4,5,6];
+const TOPICS={1:"시작하기",2:"봄",3:"여름",4:"가을",5:"겨울",6:"마무리"};
+
+/* ---------- 저장소: Netlify 서버(공유) 또는 미리보기(이 기기) ---------- */
+function makeNetlifyStore(){
+  const ok=async r=>{if(!r.ok)throw{status:r.status};return r.json()};
+  return{
+    shared:true,
+    async load(){
+      const d=await ok(await fetch("/api/state",{cache:"no-store"}));
+      const works=[];
+      for(const m of d.members)for(const[k,v]of Object.entries(m.works||{}))if(v&&v.key)works.push({member_id:m.id,week:Number(k),path:v.key,updated_at:v.updated_at});
+      return{members:d.members.map(m=>({id:m.id,name:m.name,sort:m.sort})),works};
+    },
+    async rename(id,name){await ok(await fetch("/api/name",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({id,name})}))},
+    async upload(id,week,blob){const d=await ok(await fetch(`/api/work?id=${id}&week=${week}`,{method:"PUT",headers:{"content-type":blob.type||"image/jpeg"},body:blob}));return d.key},
+    async setWork(){},            // 서버가 올리면서 함께 기록
+    async removeWork(id,week){await ok(await fetch(`/api/work?id=${id}&week=${week}`,{method:"DELETE"}))},
+    async removeFile(){},         // 서버가 예전 그림을 함께 지움
+    url(key){return "/api/img/"+encodeURIComponent(key)},
+  };
+}
+function makeLocalStore(){
+  const KEY="wc-local-v1";
+  const read=()=>{try{const v=JSON.parse(localStorage.getItem(KEY));if(v&&v.members)return v}catch(e){}
+    return{members:Array.from({length:16},(_,i)=>({id:i+1,name:"회원 "+String(i+1).padStart(2,"0"),sort:i+1})),works:[]}};
+  const write=v=>{try{localStorage.setItem(KEY,JSON.stringify(v))}catch(e){throw{message:"미리보기 저장 공간이 가득 찼어요."}}};
+  return{
+    shared:false,
+    async load(){return read()},
+    async rename(id,name){const v=read();const m=v.members.find(x=>x.id===id);if(m)m.name=name;write(v)},
+    async upload(id,week,blob){return await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(blob)})},
+    async setWork(id,week,path){const v=read();v.works=v.works.filter(w=>!(w.member_id===id&&w.week===week));v.works.push({member_id:id,week,path,updated_at:new Date().toISOString()});write(v)},
+    async removeWork(id,week){const v=read();v.works=v.works.filter(w=>!(w.member_id===id&&w.week===week));write(v)},
+    async removeFile(){},
+    url(path){return path},
+  };
+}
+let store=makeLocalStore();
+
+/* ---------- 상태 ---------- */
+let members=[];          // [{id,name,sort,works:{1:{path,updated_at}}}]
+let me=null, view="member", sortMode="order", focusWeek=null;
+let editing=false, nameDraft="", confirmDel=null, pending=null;
+const busy=new Set();
+const LS=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}};
+me=Number(LS("wc-me"))||null;
+if(["member","week"].includes(LS("wc-view")))view=LS("wc-view");
+if(["order","name","progress"].includes(LS("wc-sort")))sortMode=LS("wc-sort");
+
+const $=id=>document.getElementById(id);
+function el(tag,attrs={},...kids){const n=document.createElement(tag);for(const[k,v]of Object.entries(attrs)){if(k==="class")n.className=v;else if(k.startsWith("on"))n.addEventListener(k.slice(2),v);else if(v!==false&&v!=null)n.setAttribute(k,v===true?"":v)}for(const k of kids)if(k!=null)n.append(k);return n}
+function toast(msg,ms=2800){const t=$("toast");t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,ms)}
+const workOf=(m,w)=>m&&m.works[w]||null;
+const doneOf=m=>WEEKS.filter(w=>workOf(m,w)).length;
+const safeName=s=>(s||"이름없음").replace(/[\\/:*?"<>|]/g,"_").trim()||"이름없음";
+const meM=()=>members.find(m=>m.id===me)||null;
+
+async function refresh(quiet){
+  try{
+    const {members:ms,works}=await store.load();
+    members=ms.map(m=>({...m,works:{}}));
+    for(const w of works){const m=members.find(x=>x.id===w.member_id);if(m&&WEEKS.includes(w.week))m.works[w.week]={path:w.path,updated_at:w.updated_at}}
+    $("status").hidden=members.length>0;
+    if(!members.length){$("status").replaceChildren(el("b",{},"회원 명단이 아직 없어요"),"잠시 뒤 새로고침해 주세요.")}
+    render();
+  }catch(e){
+    if(!quiet){$("status").hidden=false;$("status").replaceChildren(el("b",{},"작품첩을 불러오지 못했어요"),"인터넷 연결을 확인하고 새로고침해 주세요.")}
+  }
+}
+
+function sorted(){
+  const l=members.slice();
+  if(sortMode==="name")l.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ko")||a.sort-b.sort);
+  else if(sortMode==="progress")l.sort((a,b)=>doneOf(b)-doneOf(a)||a.sort-b.sort);
+  else l.sort((a,b)=>a.sort-b.sort);
+  return l;
+}
+
+/* ---------- 그리기 ---------- */
+function render(){
+  const total=members.length*6||96, got=members.reduce((s,m)=>s+doneOf(m),0);
+  const p=total?Math.round(got/total*100):0;
+  $("pct").textContent=p+"%";$("pct-sub").textContent=`전체 ${total}점 중 ${got}점 올라옴`;$("pct-bar").style.width=p+"%";
+  renderWeeks();renderPicker();renderMine();
+  $("view-member").setAttribute("aria-pressed",view==="member");
+  $("view-week").setAttribute("aria-pressed",view==="week");
+  for(const b of $("sort-seg").querySelectorAll("button"))b.setAttribute("aria-pressed",b.dataset.sort===sortMode);
+  $("grid").hidden=view!=="member";$("weekview").hidden=view!=="week";
+  $("save-all").hidden=!got;
+  if(view==="member")renderGrid();else renderWeekView();
+}
+
+function renderWeeks(){
+  const box=$("weeks");box.replaceChildren();const n0=members.length||16;
+  for(const w of WEEKS){
+    const n=members.filter(m=>workOf(m,w)).length;
+    const bar=el("div",{class:"bar"});const i=el("i");i.style.width=(n/n0*100)+"%";bar.append(i);
+    box.append(el("button",{class:"week",type:"button","aria-current":String(view==="week"&&focusWeek===w),onclick:()=>goWeek(w)},
+      el("span",{class:"wn"},w+"주차"),el("b",{},TOPICS[w]),el("span",{class:"count"},`${n} / ${n0}명`),bar));
+  }
+}
+function goWeek(w){view="week";focusWeek=w;LS("wc-view",view);render();const t=$("wk-"+w);if(t)t.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"})}
+
+function renderPicker(){
+  const s=$("who"),cur=String(me||"");
+  const opts=[el("option",{value:""},"이름을 골라 주세요"),...members.slice().sort((a,b)=>a.sort-b.sort).map(m=>el("option",{value:String(m.id)},`${String(m.sort).padStart(2,"0")}. ${m.name}`))];
+  s.replaceChildren(...opts);s.value=cur;
+}
+
+function renderMine(){
+  const box=$("mine");box.replaceChildren();const m=meM();
+  if(!m){box.append(el("div",{class:"state"},el("b",{},"먼저 내 이름을 골라 주세요"),"이름을 고르면 1주차부터 6주차까지 내 그림 칸이 열려요."));return}
+  const head=el("div",{class:"mine-head"});
+  if(editing){
+    const inp=el("input",{class:"name-input",id:"name-input",value:nameDraft,maxlength:"20","aria-label":"새 이름"});
+    inp.addEventListener("input",()=>nameDraft=inp.value);
+    inp.addEventListener("keydown",e=>{if(e.key==="Enter")saveName();if(e.key==="Escape"){editing=false;render()}});
+    head.append(inp,el("button",{class:"btn primary",type:"button",onclick:saveName},"저장"),el("button",{class:"icon-btn",type:"button",onclick:()=>{editing=false;render()}},"취소"));
+    setTimeout(()=>{if(document.activeElement!==inp){inp.focus();inp.setSelectionRange(inp.value.length,inp.value.length)}},0);
+  }else{
+    head.append(el("span",{class:"name"},m.name),el("button",{class:"icon-btn",type:"button",onclick:()=>{editing=true;nameDraft=m.name;render()}},"✎ 이름 수정"),el("span",{class:"done"},`${doneOf(m)} / 6 완료`));
+  }
+  const slots=el("div",{class:"slots"});
+  for(const w of WEEKS){
+    const wk=workOf(m,w);
+    const slot=el("div",{class:"slot "+(wk?"filled":"")},el("span",{class:"wk"},`${w} · ${TOPICS[w]}`));
+    if(wk){
+      slot.append(el("img",{src:store.url(wk.path),alt:`${m.name} ${w}주차 ${TOPICS[w]} 그림`,loading:"lazy",onclick:()=>openViewer(m,w)}),
+        el("div",{class:"acts"},el("button",{type:"button",onclick:()=>pick(m.id,w,wk.path)},"교체"),el("button",{type:"button",class:"del",onclick:()=>{confirmDel=w;render()}},"삭제")));
+    }else slot.append(el("button",{class:"add",type:"button",onclick:()=>pick(m.id,w,null)},"+ 그림 올리기"));
+    if(busy.has(m.id+":"+w))slot.append(el("div",{class:"busy"},"올리는 중…"));
+    slots.append(slot);
+  }
+  const card=el("div",{class:"mine"},head,slots);
+  if(confirmDel)card.append(el("div",{class:"confirm"},el("span",{},`${confirmDel}주차(${TOPICS[confirmDel]}) 그림을 삭제할까요? 되돌릴 수 없어요.`),
+    el("button",{class:"btn",type:"button",onclick:()=>{confirmDel=null;render()}},"취소"),
+    el("button",{class:"btn",type:"button",style:"color:var(--danger)",onclick:()=>removeWork(m.id,confirmDel)},"삭제")));
+  if(doneOf(m))card.append(el("div",{},el("button",{class:"btn",type:"button",onclick:e=>saveZip([m],`${safeName(m.name)}_풍경수채화.zip`,e.currentTarget)},"내 그림 모두 저장")));
+  box.append(card);
+}
+
+function renderGrid(){
+  const g=$("grid");g.replaceChildren();
+  for(const m of sorted()){
+    const thumbs=el("div",{class:"thumbs"});
+    for(const w of WEEKS){const wk=workOf(m,w);
+      thumbs.append(wk?el("div",{class:"thumb on",title:`${w}주차 ${TOPICS[w]}`},el("img",{src:store.url(wk.path),alt:`${m.name} ${w}주차 ${TOPICS[w]}`,loading:"lazy",onclick:()=>openViewer(m,w)}))
+        :el("div",{class:"thumb",title:`${w}주차 ${TOPICS[w]}`},TOPICS[w]));}
+    const d=doneOf(m),bar=el("div",{class:"bar",style:"flex:1"});const i=el("i");i.style.width=(d/6*100)+"%";bar.append(i);
+    g.append(el("article",{class:"card"+(m.id===me?" me":"")},
+      el("div",{class:"card-head"},el("span",{class:"num"},String(m.sort).padStart(2,"0")),
+        el("button",{class:"name",type:"button",title:"이 이름으로 올리기",onclick:()=>choose(m.id,true)},m.name),el("span",{class:"done"},`${d}/6`)),
+      thumbs,
+      el("div",{class:"card-foot"},bar,d?el("button",{class:"icon-btn",type:"button",onclick:e=>saveZip([m],`${safeName(m.name)}_풍경수채화.zip`,e.currentTarget)},"저장"):null)));
+  }
+}
+
+function renderWeekView(){
+  const box=$("weekview");box.replaceChildren();const list=sorted();
+  for(const w of WEEKS){
+    const got=list.filter(m=>workOf(m,w));
+    const head=el("div",{class:"wk-head"},el("span",{class:"count"},w+"주차"),el("h2",{},TOPICS[w]),el("span",{class:"count"},`${got.length}명`),el("span",{class:"sp"}));
+    if(got.length)head.append(el("button",{class:"btn",type:"button",onclick:e=>saveZip(got,`풍경수채화_${w}주차_${TOPICS[w]}.zip`,e.currentTarget,[w])},"이 주차 그림 저장"));
+    const gal=el("div",{class:"gallery"});
+    if(!got.length)gal.append(el("div",{class:"none"},`아직 ${w}주차 '${TOPICS[w]}' 그림이 없어요.`));
+    for(const m of got)gal.append(el("figure",{},el("img",{src:store.url(workOf(m,w).path),alt:`${m.name} ${w}주차 ${TOPICS[w]} 그림`,loading:"lazy",onclick:()=>openViewer(m,w)}),el("figcaption",{},m.name)));
+    box.append(el("section",{class:"wk-sec",id:"wk-"+w},head,gal));
+  }
+}
+
+/* ---------- 동작 ---------- */
+function choose(id,scroll){me=id||null;LS("wc-me",String(me||""));editing=false;confirmDel=null;render();if(scroll)$("mine-h").scrollIntoView({behavior:"smooth"})}
+$("who").addEventListener("change",e=>choose(Number(e.target.value)));
+
+async function saveName(){
+  const m=meM();const name=nameDraft.trim().slice(0,20);
+  if(!name){toast("이름을 한 글자 이상 입력해 주세요.");return}
+  editing=false;
+  try{await store.rename(m.id,name);m.name=name;render();toast("이름을 바꿨어요.")}
+  catch(e){toast("이름을 저장하지 못했어요. 잠시 뒤 다시 시도해 주세요.");render()}
+}
+
+function pick(id,week,oldPath){pending={id,week,oldPath};$("file").value="";$("file").click()}
+$("file").addEventListener("change",async e=>{
+  const f=e.target.files&&e.target.files[0];if(!f||!pending)return;
+  const {id,week,oldPath}=pending;pending=null;const k=id+":"+week;busy.add(k);render();
+  try{
+    const blob=await shrink(f,store.shared?2400:1000,store.shared?.9:.75);
+    const path=await store.upload(id,week,blob);
+    await store.setWork(id,week,path);
+    if(oldPath)store.removeFile(oldPath);
+    toast(`${week}주차(${TOPICS[week]}) 그림을 ${oldPath?"교체했어요":"올렸어요"}.`);
+  }catch(err){
+    toast(err&&err.code==="decode"?"이 사진은 열 수 없어요. JPG나 PNG로 올려 주세요.":(err&&err.message&&!store.shared?err.message:"올리지 못했어요. 인터넷 연결을 확인하고 다시 시도해 주세요."),4000);
+  }finally{busy.delete(k);await refresh(true)}
+});
+
+function shrink(file,max,q){
+  return new Promise((res,rej)=>{
+    const url=URL.createObjectURL(file),img=new Image();
+    img.onload=()=>{
+      let w=img.naturalWidth,h=img.naturalHeight;const s=Math.min(1,max/Math.max(w,h));w=Math.round(w*s);h=Math.round(h*s);
+      const c=document.createElement("canvas");c.width=w;c.height=h;const x=c.getContext("2d");
+      x.fillStyle="#fff";x.fillRect(0,0,w,h);x.drawImage(img,0,0,w,h);URL.revokeObjectURL(url);
+      c.toBlob(b=>b?res(b):rej({code:"decode"}),"image/jpeg",q);
+    };
+    img.onerror=()=>{URL.revokeObjectURL(url);rej({code:"decode"})};
+    img.src=url;
+  });
+}
+
+async function removeWork(id,week){
+  const m=members.find(x=>x.id===id),wk=workOf(m,week);confirmDel=null;
+  try{await store.removeWork(id,week);if(wk)store.removeFile(wk.path);toast(`${week}주차 그림을 삭제했어요.`)}
+  catch(e){toast("삭제하지 못했어요. 잠시 뒤 다시 시도해 주세요.")}
+  await refresh(true);
+}
+
+function openViewer(m,w){const wk=workOf(m,w);if(!wk)return;$("viewer-title").textContent=`${m.name} · ${w}주차 ${TOPICS[w]}`;$("viewer-img").src=store.url(wk.path);$("viewer-img").alt=`${m.name} ${w}주차 ${TOPICS[w]} 그림`;try{$("viewer").showModal()}catch(e){$("viewer").setAttribute("open","")}}
+$("viewer-close").addEventListener("click",()=>$("viewer").close());
+$("viewer").addEventListener("click",e=>{if(e.target===$("viewer"))$("viewer").close()});
+
+async function saveZip(list,filename,btn,weeks=WEEKS){
+  if(typeof JSZip==="undefined"){toast("압축 도구를 불러오지 못했어요. 새로고침해 주세요.");return}
+  const label=btn.textContent;btn.disabled=true;
+  try{
+    const zip=new JSZip(),folders=new Map(),items=[];let n=0,fail=0;
+    for(const m of list)for(const w of weeks){const wk=workOf(m,w);if(wk)items.push([m,w,wk])}
+    const byFolder=list.length>1&&weeks.length>1;
+    for(const[m,w,wk]of items){
+      btn.textContent=`모으는 중… ${n+fail+1}/${items.length}`;
+      try{
+        const r=await fetch(store.url(wk.path));if(!r.ok)throw 0;const b=await r.blob();
+        let folder=safeName(m.name);
+        if(byFolder){const o=folders.get(folder);if(o&&o!==m.id)folder+="_"+String(m.sort).padStart(2,"0");folders.set(folder,m.id)}
+        let fp=(byFolder?folder+"/":"")+`${safeName(m.name)}_${w}주차_${TOPICS[w]}.jpg`;
+        if(zip.file(fp))fp=fp.replace(/\.jpg$/,`_${String(m.sort).padStart(2,"0")}.jpg`);
+        zip.file(fp,b);n++;
+      }catch(e){fail++}
+    }
+    if(!n){toast("저장할 그림을 불러오지 못했어요.");return}
+    btn.textContent="압축하는 중…";
+    const blob=await zip.generateAsync({type:"blob"});
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=filename;document.body.append(a);a.click();
+    setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000);
+    toast(`${n}장을 저장했어요.`+(fail?` (${fail}장은 불러오지 못했어요)`:""),4000);
+  }catch(e){toast("저장하지 못했어요. 잠시 뒤 다시 시도해 주세요.")}
+  finally{btn.disabled=false;btn.textContent=label}
+}
+$("save-all").addEventListener("click",e=>saveZip(sorted(),"풍경수채화_전체작품_이름별.zip",e.currentTarget));
+
+$("view-member").addEventListener("click",()=>{view="member";focusWeek=null;LS("wc-view",view);render()});
+$("view-week").addEventListener("click",()=>{view="week";LS("wc-view",view);render()});
+$("sort-seg").addEventListener("click",e=>{const b=e.target.closest("button[data-sort]");if(!b)return;sortMode=b.dataset.sort;LS("wc-sort",sortMode);render()});
+
+/* 다른 사람이 올린 그림을 반영: 30초마다, 그리고 화면으로 돌아올 때 새로고침 */
+(async()=>{
+  // Netlify 서버가 응답하면 공유 모드, 아니면(파일로 열었거나 끌어다 놓기 배포) 미리보기 모드
+  try{if(location.protocol.startsWith("http")){const s=makeNetlifyStore();await s.load();store=s}}catch(e){}
+  if(!store.shared)$("demo-banner").hidden=false;
+  refresh();
+})();
+setInterval(()=>{if(!document.hidden&&!editing&&!busy.size)refresh(true)},30000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&!editing)refresh(true)});
+</script>
+</body>
+</html>
