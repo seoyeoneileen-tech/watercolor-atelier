@@ -98,7 +98,11 @@ header h1{font-family:var(--display);font-weight:700;font-size:clamp(28px,5vw,40
 .slot button.add:hover{background:var(--wash-soft)}
 .slot img{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in}
 .slot .acts{position:absolute;right:4px;bottom:4px;display:flex;gap:4px;z-index:1}
-.slot .acts button{border:0;border-radius:5px;font-size:12px;padding:3px 8px;background:color-mix(in srgb,var(--sheet) 90%,transparent);color:var(--ink)}
+.slot .acts button{border:1px solid var(--line);border-radius:6px;font-size:13px;padding:5px 10px;min-height:32px;background:var(--sheet);color:var(--ink);touch-action:manipulation}
+.slot .ask{position:absolute;inset:0;z-index:3;background:color-mix(in srgb,var(--sheet) 94%,transparent);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:4px;text-align:center;font-size:13px;white-space:nowrap}
+.slot .ask div{display:flex;gap:6px}
+.slot .ask button{border:1px solid var(--line);border-radius:6px;background:var(--sheet);padding:4px 9px;min-height:30px;font-size:13px;white-space:nowrap}
+.slot .ask button.yes{background:var(--danger);border-color:var(--danger);color:#fff}
 .slot .acts button.del{color:var(--danger)}
 .slot .busy{position:absolute;inset:0;display:grid;place-items:center;background:color-mix(in srgb,var(--sheet) 82%,transparent);font-size:12px;color:var(--wash);z-index:2}
 .confirm{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:14px;background:var(--wash-soft);color:var(--ink);border-radius:8px;padding:8px 10px}
@@ -340,13 +344,14 @@ function renderMine(){
       slot.append(el("img",{src:store.url(wk.path),alt:`${m.name} ${w}주차 ${TOPICS[w]} 그림`,loading:"lazy",onclick:()=>openViewer(m,w)}),
         el("div",{class:"acts"},el("button",{type:"button",onclick:()=>pick(m.id,w,wk.path)},"교체"),el("button",{type:"button",class:"del",onclick:()=>{confirmDel=w;render()}},"삭제")));
     }else slot.append(el("button",{class:"add",type:"button",onclick:()=>pick(m.id,w,null)},"+ 그림 올리기"));
-    if(busy.has(m.id+":"+w))slot.append(el("div",{class:"busy"},"올리는 중…"));
+    if(wk&&confirmDel===w)slot.append(el("div",{class:"ask",role:"alertdialog","aria-label":"삭제 확인"},
+      el("span",{},"지울까요?"),
+      el("div",{},el("button",{type:"button",onclick:()=>{confirmDel=null;render()}},"취소"),
+        el("button",{type:"button",class:"yes",onclick:()=>removeWork(m.id,w)},"삭제"))));
+    if(busy.has(m.id+":"+w))slot.append(el("div",{class:"busy"},"처리 중…"));
     slots.append(slot);
   }
   const card=el("div",{class:"mine"},head,slots);
-  if(confirmDel)card.append(el("div",{class:"confirm"},el("span",{},`${confirmDel}주차(${TOPICS[confirmDel]}) 그림을 삭제할까요? 되돌릴 수 없어요.`),
-    el("button",{class:"btn",type:"button",onclick:()=>{confirmDel=null;render()}},"취소"),
-    el("button",{class:"btn",type:"button",style:"color:var(--danger)",onclick:()=>removeWork(m.id,confirmDel)},"삭제")));
   if(doneOf(m))card.append(el("div",{},el("button",{class:"btn",type:"button",onclick:e=>saveZip([m],`${safeName(m.name)}_풍경수채화.zip`,e.currentTarget)},"내 그림 모두 저장")));
   box.append(card);
 }
@@ -423,9 +428,10 @@ function shrink(file,max,q){
 
 async function removeWork(id,week){
   const m=members.find(x=>x.id===id),wk=workOf(m,week);confirmDel=null;
+  const k=id+":"+week;busy.add(k);render();
   try{await store.removeWork(id,week);if(wk)store.removeFile(wk.path);toast(`${week}주차 그림을 삭제했어요.`)}
   catch(e){toast("삭제하지 못했어요. 잠시 뒤 다시 시도해 주세요.")}
-  await refresh(true);
+  busy.delete(k);await refresh(true);
 }
 
 function openViewer(m,w){const wk=workOf(m,w);if(!wk)return;$("viewer-title").textContent=`${m.name} · ${w}주차 ${TOPICS[w]}`;$("viewer-img").src=store.url(wk.path);$("viewer-img").alt=`${m.name} ${w}주차 ${TOPICS[w]} 그림`;try{$("viewer").showModal()}catch(e){$("viewer").setAttribute("open","")}}
